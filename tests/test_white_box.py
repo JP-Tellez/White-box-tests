@@ -67,49 +67,197 @@ class TestFirstFour(unittest.TestCase):
 class TestVendingMachine(unittest.TestCase):
     ''' VendingMachine unittest class '''
 
+    def setUp(self):
+        self.vm = VendingMachine()
+
 
     def test_init(self):
-        vm = VendingMachine()
-        self.assertEqual(vm.state, "Ready")
+        self.assertEqual(self.vm.state, "Ready")
 
     def test_insert_coin_valid(self):
-        vm = VendingMachine()
-        elreturn = vm.insert_coin()
-        self.assertEqual(vm.state, "Dispensing")
+        elreturn = self.vm.insert_coin()
+        self.assertEqual(self.vm.state, "Dispensing")
         self.assertEqual(elreturn, "Coin Inserted. Select your drink.")
 
     def test_insert_coin_invalid(self):
-        vm = VendingMachine()
-        vm.insert_coin()
-        elreturn = vm.insert_coin()
-        self.assertEqual(vm.state, "Dispensing")
+        self.vm.insert_coin()
+        elreturn = self.vm.insert_coin()
+        self.assertEqual(self.vm.state, "Dispensing")
         self.assertEqual(elreturn, "Invalid operation in current state.")
 
     def test_select_drink_valid(self):
-        vm = VendingMachine()
-        vm.state = "Dispensing"
-        elreturn = vm.select_drink()
-        self.assertEqual(vm.state, "Ready")
+        self.vm.state = "Dispensing"
+        elreturn = self.vm.select_drink()
+        self.assertEqual(self.vm.state, "Ready")
         self.assertEqual(elreturn, "Drink Dispensed. Thank you!")
 
     def test_select_drink_invalid(self):
-        vm = VendingMachine()
-        # vm.state = "Ready"
-        elreturn = vm.select_drink()
-        # self.assertEqual(vm.state, "Ready")
+        elreturn = self.vm.select_drink()
         self.assertEqual(elreturn, "Invalid operation in current state.")
         
 
 class TestTrafficLight(unittest.TestCase):
     ''' TrafficLight unittest class '''
 
+    def setUp(self):
+        self.tl = TrafficLight()
+
     def test_init(self):
-        tl = TrafficLight()
-        self.assertEqual(tl.state, "Red")
+        self.assertEqual(self.tl.state, "Red")
 
     def test_change_state_all(self):
-        tl = TrafficLight()
-        tl.change_state()
+        self.tl.change_state()
+        self.assertEqual(self.tl.state, "Green")
+        self.tl.change_state()
+        self.assertEqual(self.tl.state, "Yellow")
+        self.tl.change_state()
+        self.assertEqual(self.tl.state, "Red")
+        self.tl.change_state()
+        self.assertEqual(self.tl.state, "Green")
+    
+    def test_get_current_state(self):
+        elstate = self.tl.get_current_state()
+        self.assertEqual(self.tl.state, elstate)
+        self.assertEqual(elstate, "Red")
+
+
+class TestUserAuthentication(unittest.TestCase):
+    ''' User Authentication unittest class '''
+
+    def setUp(self):
+        self.ua = UserAuthentication()
+
+    def test_init(self):
+        self.assertEqual(self.ua.state, "Logged Out")
+
+    def test_login_success(self):
+        elreturn = self.ua.login()
+        self.assertEqual(self.ua.state, "Logged In")
+        self.assertEqual(elreturn, "Login successful")
+
+    def test_login_invalid(self):
+        self.ua.state = "something"
+        elreturn = self.ua.login()
+        # self.assertEqual(ua.state, "Logged In")
+        self.assertEqual(elreturn, "Invalid operation in current state")
+
+    def test_logout_success(self):
+        self.ua.state = "Logged In"
+        # or ua.login()
+        elreturn = self.ua.logout()
+        self.assertEqual(self.ua.state, "Logged Out")
+        self.assertEqual(elreturn, "Logout successful")
+
+    def test_logout_failed(self):
+        elreturn = self.ua.logout()
+        self.assertEqual(self.ua.state, "Logged Out")
+        self.assertEqual(elreturn, "Invalid operation in current state")
+
+
+class TestDocumentEditingSystem(unittest.TestCase):
+    ''' DES unittest class '''
+
+    def setUp(self):
+        self.des = DocumentEditingSystem()
+
+    def test_init(self):
+        self.assertEqual(self.des.state, "Editing")
+
+    def test_save_document_success(self):
+        elreturn = self.des.save_document()
+        self.assertEqual(self.des.state, "Saved")
+        self.assertEqual(elreturn, "Document saved successfully")
+
+    def test_save_document_failed(self):
+        self.des.state = "Saved"
+        elreturn = self.des.save_document()
+        self.assertEqual(elreturn, "Invalid operation in current state")
+
+    def test_edit_document_success(self):
+        self.des.state = "Saved"
+        elreturn = self.des.edit_document()
+        self.assertEqual(self.des.state, "Editing")
+        self.assertEqual(elreturn, "Editing resumed")
+
+    def test_edit_document_failed(self):
+        elreturn = self.des.edit_document()
+        self.assertEqual(self.des.state, "Editing")
+        self.assertEqual(elreturn, "Invalid operation in current state")
+
+    
+class TestElevatorSystem(unittest.TestCase):
+    ''' ElevatorSystem unittest class '''
+
+    def setUp(self):
+        self.es = ElevatorSystem()
+    
+    def test_init(self):
+        self.assertEqual(self.es.state, "Idle")
+    
+    def test_move_up_success(self):
+        elreturn = self.es.move_up()
+        self.assertEqual(elreturn, "Elevator moving up")
+        self.assertEqual(self.es.state, "Moving Up")
+    
+    def test_move_up_failed(self):
+        self.es.state = "something"
+        elreturn = self.es.move_up()
+        self.assertEqual(elreturn, "Invalid operation in current state")
+
+    def test_move_down_success(self):
+        elreturn = self.es.move_down()
+        self.assertEqual(elreturn, "Elevator moving down")
+        self.assertEqual(self.es.state, "Moving Down")
+    
+    def test_move_down_failed(self):
+        self.es.state = "something"
+        elreturn = self.es.move_down()
+        self.assertEqual(elreturn, "Invalid operation in current state")
+    
+    def test_stop_success(self):
+        self.es.state = "Moving Up"
+        elreturn = self.es.stop()
+        self.assertEqual(self.es.state, "Idle")
+        self.assertEqual(elreturn, "Elevator stopped")
+        self.es.state = "Moving Down"
+        elreturn = self.es.stop()
+        self.assertEqual(self.es.state, "Idle")
+        self.assertEqual(elreturn, "Elevator stopped")
+    
+    def test_stop_failed(self):
+        elreturn = self.es.stop()
+        self.assertEqual(elreturn, "Invalid operation in current state")
+    
+
+    
+class TestBankAccount(unittest.TestCase):
+    ''' BankAccount unittest class '''
+
+    def setUp(self):
+        self.ba = BankAccount(1, 50)
+
+    def test_init(self):
+        number = 2
+        balance = 100
+        ba = BankAccount(number, balance)
+        self.assertEqual(ba.account_number, 2)
+        self.assertEqual(ba.balance, 100)
+    
+    @patch('builtins.print')
+    def test_view_account(self, mock_print):
+        self.ba.view_account()
+        mock_print.assert_called_with("The account 1 has a balance of 50")
+
+
+class TestBankingSystem(unittest.TestCase):
+    ''' BankingSystem unittest class '''
+
+    def setUp(self):
+        self.ba = BankAccount(1, 50)
+        self.bs = BankingSystem()
+
+
+
 
 
 
