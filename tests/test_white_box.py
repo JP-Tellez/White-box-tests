@@ -256,6 +256,9 @@ class TestBankingSystem(unittest.TestCase):
         self.ba = BankAccount(1, 50)
         self.bs = BankingSystem()
 
+    def test_init(self):
+        ''' something '''
+
 
 
 
