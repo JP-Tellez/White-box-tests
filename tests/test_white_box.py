@@ -4,8 +4,7 @@
 import unittest
 from unittest.mock import patch
 
-from src.white_box import VendingMachine, TrafficLight, UserAuthentication, DocumentEditingSystem, ElevatorSystem, BankAccount, BankingSystem, Product, ShoppingCart
-from src.white_box import categorize_product, validate_date, check_file_size, authenticate_user
+from src.white_box import *
 
 
 class TestFirstFour(unittest.TestCase):
