@@ -1,4 +1,4 @@
-# python -m unittest tests/test_book_store.py
+# python -m unittest tests/test_white_box.py
 # python -m unittest discover
 
 import unittest
@@ -331,168 +331,114 @@ class TestBankingSystem(unittest.TestCase):
     
 
 
+class TestProduct(unittest.TestCase):
+    ''' Producto unittest class '''
 
+    def setUp(self):
+        self.p = Product("apple", 10)
 
-
-
-
-
-# class TestBook(unittest.TestCase):
-#     ''' Book unittest class '''
-
-#     def setUp(self):
-#         self.title = "Title1"
-#         self.author = "Author1"
-#         self.price = 100
-#         self.quantity = 50
-
-
-#     def test_init(self):
-#         title = "Title"
-#         author = "Author"
-#         price = 100
-#         quantity = 50
-#         the_book = Book(title, author, price, quantity)
-#         self.assertEqual(the_book.title, title)
-#         self.assertEqual(the_book.author, author)
-#         self.assertEqual(the_book.price, price)
-#         self.assertEqual(the_book.quantity, quantity)
-
-#         # el prode uso el setUP para crear el libro
-#         # book = Book(self.title, self.author, self.price, self.quantity)
-#         # y ya luego los mismos assertEqual pero como assertEqual(book.title, self.title)
-
-
-#     @patch('builtins.print')
-#     def test_display(self, mock_print):
-#         title = "Title"
-#         author = "Author"
-#         price = 100
-#         quantity = 50
-#         the_book = Book(title, author, price, quantity)
-
-#         the_book.display()
-#         mock_print.assert_any_call(f"Title: {title}")
-#         mock_print.assert_any_call(f"Author: {author}")
-#         mock_print.assert_any_call(f"Price: ${price}")
-#         mock_print.assert_any_call(f"Quantity: {quantity}")
-
-#         # Lo del profe
-#         # lo mismo del patch y eso pero primero crea el book asi
-#         # book = Book(self.title, self.author, self.price, self.quantity)
-#         # book.display()
-#         # self.assertTrue(mock_print.called) #Checa si fue llamado el print
-#         # self.assertEqual(mock_print.call_count, 4) #Checa si se llamo 4 veces
-#         # mock_print.assert_any_call(f"Title: {title}") # el mismo que yo 
-#         # assert any call significa que checa en cualquiera pero con que este
-#         # mock_print.assert_called_with(f"Quantity: {quantity}") #Checa nomas el ultimo
-
-
-
-
-
-
-
-
+    def test_init(self):
+        apple = Product("apple", 10)
+        self.assertEqual(apple.name, "apple") # or only p.name
+        self.assertEqual(apple.price, 10) # or only p.price
     
-# class TestBookStore(unittest.TestCase):
-#     '''BookStore unittest class'''
-
-#     def test_init(self):
-#         bookstore = BookStore()
-#         self.assertEqual(bookstore.books, [])
+    @patch('builtins.print')
+    def test_view_product(self, mock_print):
+        self.p.view_product()
+        mock_print.assert_called_with("The product apple has a price of 10")
     
 
-#     def test_add_book(self):
-#         bookstore = BookStore()
-#         book = Book("Title", "Author", 100, 50)
+class TestShoppingCart(unittest.TestCase):
+    ''' ShoppingCart unittest class '''
 
-#         bookstore.add_book(book)
-
-#         self.assertEqual(bookstore.books[0].title, "Title")
-#         self.assertEqual(bookstore.books[0].author, "Author")
-#         self.assertEqual(bookstore.books[0].price, 100)
-#         self.assertEqual(bookstore.books[0].quantity, 50)
-
-#         # Rodrigo
-#         self.assertIn(book, bookstore.books)
-#         # or
-#         self.assertEqual(bookstore.books[0], book)
+    def setUp(self):
+        self.p = Product("apple", 10)
+        self.p2 = Product("pineapple", 5)
+        self.sc = ShoppingCart()
+    
+    def test_init(self):
+        self.assertEqual(self.sc.items, [])
 
 
-#     @patch('src.book_store.Book.display')
-#     def test_display_books_w_books(self, mock_print):
-#         ''' In process '''
-#         bookstore = BookStore()
-#         book1 = Book("Title1", "Author1", 100, 50)
-#         book2 = Book("Title2", "Author2", 100, 50)
-#         book3 = Book("Title3", "Author3", 100, 50)
+    # add_product
+    def test_add_product_new(self):
+        self.sc.add_product(self.p, 5)
+        self.assertEqual(len(self.sc.items), 1)
+        self.assertEqual(self.sc.items[0]["product"], self.p)
+        self.assertEqual(self.sc.items[0]["quantity"], 5)
+    
+    def test_add_product_existing(self):
+        self.sc.add_product(self.p, 5)
+        self.sc.add_product(self.p, 5)
+        self.assertEqual(len(self.sc.items), 1)
+        self.assertEqual(self.sc.items[0]["product"], self.p)
+        self.assertEqual(self.sc.items[0]["quantity"], 10)
+    
+    def test_add_product_a_lot(self):
+        self.sc.add_product(self.p, 5)
+        self.sc.add_product(self.p2, 5)
 
-#         # idk if you can use add_book in here (not recomended)
-#         bookstore.add_book(book1)
-#         bookstore.add_book(book2)
-#         bookstore.add_book(book3)
+        self.assertEqual(len(self.sc.items), 2)
 
-#         bookstore.display_books()
+        self.assertEqual(self.sc.items[0]["product"], self.p)
+        self.assertEqual(self.sc.items[0]["quantity"], 5)
+        self.assertEqual(self.sc.items[1]["product"], self.p2)
+        self.assertEqual(self.sc.items[1]["quantity"], 5)
+    
 
-#         # mock_print.assert_any_call("Books available in the store:")
-#         # mock_print.assert_any_call("Title: Title1")
-#         # mock_print.assert_any_call("Title: Title2")
-#         # mock_print.assert_any_call("Title: Title3")
-#         self.assertEqual(mock_print.call_count, 3)
+    # remove
+    def test_remove_product_complete(self):
+        self.sc.add_product(self.p, 5)
+        self.sc.remove_product(self.p, 5)
+        self.assertEqual(len(self.sc.items), 0)
 
+    def test_remove_product_some(self):
+        self.sc.add_product(self.p, 5)
+        self.sc.remove_product(self.p, 3)
 
+        self.assertEqual(len(self.sc.items), 1)
 
+        self.assertEqual(self.sc.items[0]["product"], self.p)
+        self.assertEqual(self.sc.items[0]["quantity"], 2)
+        
+    def test_remove_product_not_in_cart(self):
+        self.sc.add_product(self.p, 5)
+        self.sc.remove_product(self.p2, 3)
 
+        self.assertEqual(len(self.sc.items), 1)
 
-#     @patch('builtins.print')
-#     def test_display_books_no_books(self, mock_print):
-#         ''' In process '''
-#         # display is not called
+        self.assertEqual(self.sc.items[0]["product"], self.p)
+        self.assertEqual(self.sc.items[0]["quantity"], 5)
+    
+    
+    # View art
+    @patch('builtins.print')
+    def test_view_cart_one(self, mock_print):
+        self.sc.add_product(self.p, 5)
 
-#         bookstore = BookStore()
-#         # book1 = Book("Title1", "Author1", 100, 50)
-#         # book2 = Book("Title2", "Author2", 100, 50)
-#         # book3 = Book("Title3", "Author3", 100, 50)
+        self.sc.view_cart()
 
-#         bookstore.display_books()
+        mock_print.assert_called_with("5 x apple - $50")
 
-#         mock_print.assert_any_call("No books in the store.")
+    @patch('builtins.print')
+    def test_view_cart_lots(self, mock_print):
+        self.sc.add_product(self.p, 5)
+        self.sc.add_product(self.p2, 5)
 
+        self.sc.view_cart()
 
-#     @patch('builtins.print')
-#     def test_search_book_found(self, mock_print):
-#         bookstore = BookStore()
-#         book1 = Book("Title1", "Author1", 100, 50)
-#         book2 = Book("Title2", "Author2", 100, 50)
-#         book3 = Book("Title3", "Author3", 100, 50)
+        mock_print.assert_any_call("5 x apple - $50")
+        mock_print.assert_any_call("5 x pineapple - $25")
 
-#         # idk if you can use add_book in here
-#         bookstore.add_book(book1)
-#         bookstore.add_book(book2)
-#         bookstore.add_book(book3)
+    
+    # checkout
+    @patch('builtins.print')
+    def test_checkout(self, mock_print):
+        self.sc.add_product(self.p, 5)
+        self.sc.add_product(self.p2, 5)
 
-#         bookstore.search_book("Title1")
+        self.sc.checkout()
 
-#         mock_print.assert_any_call("Found 1 book(s) with title 'Title1':")
-#         # mock_print.assert_any_call("Found 1 book(s) with title 'Title1':")
+        mock_print.assert_any_call("Total: $75")
+        mock_print.assert_any_call("Checkout completed. Thank you for shopping!")
 
-
-#     @patch('builtins.print')
-#     def test_search_book_not_found(self, mock_print):
-#         bookstore = BookStore()
-#         book1 = Book("Title1", "Author1", 100, 50)
-#         book2 = Book("Title2", "Author2", 100, 50)
-#         book3 = Book("Title3", "Author3", 100, 50)
-
-#         # idk if you can use add_book in here
-#         bookstore.add_book(book1)
-#         bookstore.add_book(book2)
-#         bookstore.add_book(book3)
-
-#         bookstore.search_book("Title4")
-
-#         mock_print.assert_any_call("No book found with title 'Title4'.")
-
-
-# # falto agregar cuando no hay libros e intentas buscar
