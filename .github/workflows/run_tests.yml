@@ -1,0 +1,23 @@
+name: Run Tests
+
+on: 
+  push:
+    branches:
+      - main  
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8' 
+
+    - name: Run tests
+      run: python -m unittest tests/test_white_box.py
