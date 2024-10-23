@@ -253,11 +253,84 @@ class TestBankingSystem(unittest.TestCase):
     ''' BankingSystem unittest class '''
 
     def setUp(self):
-        self.ba = BankAccount(1, 50)
         self.bs = BankingSystem()
 
     def test_init(self):
-        ''' something '''
+        users = {"user123": "pass123"}
+        self.assertEqual(users, self.bs.users)
+        self.assertEqual(self.bs.logged_in_users, set())
+    
+    # authenticate
+    @patch('builtins.print')
+    def test_authenticate_success(self, mock_print):
+        elreturn = self.bs.authenticate("user123", "pass123")
+        self.assertIn("user123", self.bs.logged_in_users)
+        mock_print.assert_called_with("User user123 authenticated successfully.")
+        self.assertTrue(elreturn)
+    
+    @patch('builtins.print')
+    def test_authenticate_logged(self, mock_print):
+        self.bs.logged_in_users.add("user123")
+        elreturn = self.bs.authenticate("user123", "pass123")
+        mock_print.assert_called_with("User already logged in.")
+        self.assertFalse(elreturn)
+    
+    @patch('builtins.print')
+    def test_authenticate_failed(self, mock_print):
+        elreturn = self.bs.authenticate("user123", "something")
+        mock_print.assert_called_with("Authentication failed.")
+        self.assertFalse(elreturn)
+
+    @patch('builtins.print')
+    def test_authenticate_not_found(self, mock_print):
+        elreturn = self.bs.authenticate("something", "pass123")
+        mock_print.assert_called_with("Authentication failed.")
+        self.assertFalse(elreturn)
+
+    # transfer_money
+    @patch('builtins.print')
+    def test_transfer_money_not_auth(self, mock_print):
+        elreturn = self.bs.transfer_money("user123", "user456", 100, "regular")
+        mock_print.assert_called_with("Sender not authenticated.")
+        self.assertFalse(elreturn)
+
+    @patch('builtins.print')
+    def test_transfer_money_invalid_type(self, mock_print):
+        self.bs.logged_in_users.add("user123")
+        elreturn = self.bs.transfer_money("user123", "user456", 100, "something")
+        mock_print.assert_called_with("Invalid transaction type.")
+        self.assertFalse(elreturn)
+    
+    @patch('builtins.print')
+    def test_transfer_money_regular(self, mock_print):
+        self.bs.logged_in_users.add("user123")
+        elreturn = self.bs.transfer_money("user123", "user456", 100, "regular")
+        mock_print.assert_called_with("Money transfer of $100 (regular transfer) from user123 to user456 processed successfully.")
+        self.assertTrue(elreturn)
+    
+    @patch('builtins.print')
+    def test_transfer_money_express(self, mock_print):
+        self.bs.logged_in_users.add("user123")
+        elreturn = self.bs.transfer_money("user123", "user456", 100, "express")
+        mock_print.assert_called_with("Money transfer of $100 (express transfer) from user123 to user456 processed successfully.")
+        self.assertTrue(elreturn)
+    
+    @patch('builtins.print')
+    def test_transfer_money_regular(self, mock_print):
+        self.bs.logged_in_users.add("user123")
+        elreturn = self.bs.transfer_money("user123", "user456", 100, "scheduled")
+        mock_print.assert_called_with("Money transfer of $100 (scheduled transfer) from user123 to user456 processed successfully.")
+        self.assertTrue(elreturn)
+
+    @patch('builtins.print')
+    def test_transfer_money_insufficient(self, mock_print):
+        self.bs.logged_in_users.add("user123")
+        elreturn = self.bs.transfer_money("user123", "user456", 1500, "regular")
+        mock_print.assert_called_with("Insufficient funds.")
+        self.assertFalse(elreturn)
+    
+
+
 
 
 
