@@ -21,4 +21,6 @@ jobs:
 
     - name: Run tests
       run: python -m unittest tests/test_white_box.py
+
+    - name: Run tests 2
       run: python -m unittest tests/test_mock_up.py
